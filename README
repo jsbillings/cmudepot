@@ -1,0 +1,33 @@
+As of this release, depot currently works and has been used
+on the following systems:
+	
+	IBM RT AOS 4.3
+	SunOS 4.1.1 with AFS 3.1 support
+	Ultrix 4.2a/RISC with AFS 3.1 support
+
+The following systems should compile:
+	IBM RS6000/AIX 3.1 with AFS 3.1 support
+	HP9000/720 HP/UX 8.0
+
+SYSV systems may need to define USE_UTIME so utime(3) is used instead of 
+utimes(2). This is currently required for the RS6000 and the HP. 
+There may be some problems with the HPs and RS6000s. These will be addressed
+in future releases.
+
+AFS sites should define USE_FSINFO. Sites without AFS should comment out the 
+lines starting with AFSLIBS, AFSCFLAGS, AFSOBJ. AFS is NOT required for
+depot to run. However, we have only really used depot in an AFS environment.
+
+Sites without build should examine Makefile.dist and comment
+out/uncomment the appropriate sections. Sites with build can just do a
+build -f Makefile.build. build probably only exists at CMU so if you don't
+have build, it is no big deal.
+
+Malloc.c is provided for AFS sites in which the ITC malloc has snuck
+in. The ITC malloc is probably both buggy and slow, especially on
+newer system types. The ITC malloc should not be present in version of
+AFS after 3.2.
+
+Questions about depot may be sent to depot+@andrew.cmu.edu. If you pick up
+a copy of depot, please drop a note to that address just so we have an idea
+of how many people are using it. 

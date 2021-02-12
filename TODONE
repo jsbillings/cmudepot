@@ -1,0 +1,19 @@
+Various minor bug fixes
+Speed enchancements
+target link, target copy, target noop options
+Exits if can't write the lock file with a meaningful error message
+copies files to .NEW and then renames them if the copy succeeds (checks both
+write errors and errors on close)
+
+Fewer AFS touches - 
+
+~command is run if the collection updates rather than if the target updates, 
+	IF the target is trusted (ie needs a -Q)
+
+ignore,override and specialfile are now cumulative (ie 
+	ignore: foo
+	ignore: bar
+in the custom.depot will result in foo and bar being ignored)
+
+patchlevel.h foo. about ready to go to CSR
+removed imakefile from distribution

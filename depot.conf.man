@@ -1,0 +1,105 @@
+.\"
+.\" $Header: /afs/andrew.cmu.edu/system/src/local/depot/019/RCS/depot.conf.man,v 4.1 1992/03/06 18:13:25 ww0r Exp $
+.\" $Source: /afs/andrew.cmu.edu/system/src/local/depot/019/RCS/depot.conf.man,v $
+.\"
+.\" Copyright (C) 1991 Carnegie Mellon University - All rights reserved */
+.\"
+.\" Author: Sohan C. Ramakrishna Pillai
+.\"
+.TH DEPOT.CONF 5 "25 September 1991"
+.SH NAME
+depot.conf \- depot installation instructions
+.SH SYNOPSIS
+.B \[collectiondir\]/depot.conf
+.SH DESCRIPTION
+The file
+.I depot.conf
+for a collection specifies how the contents of the collection
+are to be mapped onto the target directory \fItargetdir\fP
+by \fBdepot\fP(1).
+.LP
+Each line in \fIdepot.conf\fP may be a comment,
+a special specification entry termed a tilde-specification
+or a mapping specification. Specifications are sequentially
+processed and later specifications may override
+the effect of earlier specifications.
+.br
+Any line in \fIdepot.conf\fP starting with a # is treated as
+a comment and ignored by \fBdepot\fP(1).
+.br
+Any line in \fIdepot.conf\fP starting with a ~ is treated as
+a tilde-specification.
+.br
+All other lines in \fIdepot.conf\fP are treated as mapping entries.
+.LP
+\fBDepot\fP(1) recognizes the following tilde-specifcations:
+.PP
+.TP 8
+~afsmountpoint path
+specifies that the given path relative to \fIcollectiondir\fP
+represents an Andrew File System mountpoint.
+This specification is available
+and necessary if and only if \fBdepot\fP(1) has been compiled
+with USE_FSINFO set so as to enable it to use file system
+information to make depot operations faster when possible.
+Please contact your system administrator if you are unable
+to use this specification.
+.PP
+.TP 8
+~delete path
+prevents the specified path from being mapped by any earlier
+specification.  / should be used to specify the top level
+of the \fIcollectiondir\fP. All other paths specified must
+be relative to \fIcollectiondir\fP.
+.PP
+.TP 8
+~command label outputfilelist
+causes \fBdepot\fP(1) to execute the command specified by the label
+at the end of all other operations in order to create the
+specified output files. The command to be executed may be specified
+using the command resource in the customization file (see
+\fBcustom.depot(5)\fP). If no such resource is
+specified, the label is assumed to represent the path to an executable
+and the \fItargetdir\fP is passed along to the executable as the first
+and only argument. Such an executable must be
+specified in the label as either a complete pathname or a path relative
+to \fItargetdir\fP. The outputfilelist must be a list of pathnames
+relative to \fItargetdir\fP separated by whitespaces.
+.LP
+Mapping entries are of the form
+.sp 1
+.ce 3
+\fIfrompath topath\fP
+or
+\fIpath\fP
+.sp 1
+one on each line.
+The second form is equivalent to a mapping specification of
+.sp 1
+.ce 1
+\fIpath path\fP
+.sp 1
+and is used for brevity.
+/ should be used to specify the top level of the \fIcollectiondir\fP
+as the frompath for mapping. All other frompaths specified must
+be relative to \fIcollectiondir\fP. Similarly, / should be used to
+specify the top level of the \fItargetdir\fP as the topath for mapping.
+All other topaths
+specified must be relative to \fItargetdir\fP.
+A specification
+.sp 1
+.ce 1
+\fIfrompath topath\fP
+.sp 1
+causes \fBdepot\fP(1) to map the contents of
+\fIcollectiondir/frompath\fP to
+\fItargetdir/topath/\fP.
+.PP
+Special attention should be paid when doing mappings on symlinks. When
+the mapcommand option is set to copy, links will be copied exactly. So, it is
+possible to copy a link into a directory where the symlink information is no
+longer valid. 
+.SH AUTHOR
+Sohan C. Ramakrishna-Pillai
+.SH "SEE ALSO"
+depot(1), custom.depot(5)

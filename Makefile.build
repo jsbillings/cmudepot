@@ -1,0 +1,70 @@
+# Makefile/Buildfile for those who don't want to use imake
+# $Header: /afs/andrew.cmu.edu/system/src/local/depot/019/RCS/Makefile.build,v 4.7 1992/07/22 14:48:28 ww0r Exp $
+#
+# the +{systype} notation is specific to build. Makefile users will
+# have to comment it out
+
+CC+{sun4c_411}=/usr/lang/cc
+
+OPT=-O
+OPT+{sun4c_411}=-fast
+OPT+{pmax_ul4}=-O2 -Olimit 2000
+OPT+{rs_aix31}=-O -D_BSD -Q
+OPT+{hp700_ux80}=+O2 -DUSE_UTIME
+
+EXTRALIBS+{rs_aix31}=-lbsd
+
+CFLAGS=${OPT} ${AFSCFLAGS}
+LDOPTIONS=${CFLAGS}
+
+SUF=o
+# use the BSD malloc if malloc is in util.a in AFS
+MALLOCSRC+{rs_aix31}=Malloc.c
+MALLOCOBJ+{rs_aix31}=Malloc.${SUF}
+
+# comment out the AFS lines if you don't have AFS
+AFSSRC=AndrewFileSystem.c
+AFSOBJ=AndrewFileSystem.${SUF}
+AFSCFLAGS=-DUSE_FSINFO -I/usr/local/include
+AFSLIBDIR=/usr/local/lib
+AFSLIBS=${AFSLIBDIR}/afs/libvolser.a ${AFSLIBDIR}/afs/vlib.a \
+    ${AFSLIBDIR}/afs/libacl.a ${AFSLIBDIR}/afs/libvldb.a \
+    ${AFSLIBDIR}/libubik.a ${AFSLIBDIR}/afs/libauth.a \
+    ${AFSLIBDIR}/afs/libsys.a ${AFSLIBDIR}/afs/libcmd.a \
+    ${AFSLIBDIR}/librxkad.a ${AFSLIBDIR}/libdes.a \
+    ${AFSLIBDIR}/librx.a ${AFSLIBDIR}/liblwp.a \
+    ${AFSLIBDIR}/afs/libcom_err.a ${AFSLIBDIR}/afs/libkauth.a \
+    ${AFSLIBDIR}/afs/util.a
+
+.SUFFIXES: .u
+.c.u:
+	$(CC) -j $(CFLAGS) $<
+ 
+SRCS = depot.c DepotDB.c DepotDBVersion1.c DepotDBCommand.c CollectionList.c \
+       Collection.c Preference.c PreferenceUtil.c Lock.c check.c \
+       update.c util.c ${AFSSRC} ${MALLOCSRC}
+
+OBJS = depot.${SUF} DepotDB.${SUF} DepotDBVersion1.${SUF}\
+       DepotDBCommand.${SUF} CollectionList.${SUF} Collection.${SUF} \
+       Preference.${SUF} PreferenceUtil.${SUF} Lock.${SUF} \
+       ${AFSOBJ} check.${SUF} update.${SUF} util.${SUF} ${MALLOCOBJ}
+
+depot: ${OBJS}
+	$(CC) ${LDOPTIONS} -o $@ ${OBJS} ${EXTRALIBS} ${AFSLIBS} 
+
+install: install.depot install.man install.include
+	
+install.man:
+	$(INSTALL) depot.man ${DESTDIR}/man/man1/depot.1
+	$(INSTALL) custom.depot.man ${DESTDIR}/man/man5/custom.depot.5
+	$(INSTALL) depot.conf.man ${DESTDIR}/man/man5/depot.conf.5
+
+install.depot: depot
+	${INSTALL} depot ${DESTDIR}/bin/depot
+
+install.include:
+	${INSTALL} DepotErrorCodes.h ${DESTDIR}/include/DepotErrorCodes.h
+
+clean:
+	rm -f ${OBJS} core depot
+

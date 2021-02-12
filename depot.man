@@ -1,0 +1,150 @@
+.\"
+.\" $Header: /afs/andrew.cmu.edu/system/src/local/depot/019/RCS/depot.man,v 4.2 1992/04/08 22:15:22 sohan Exp $
+.\" $Source: /afs/andrew.cmu.edu/system/src/local/depot/019/RCS/depot.man,v $
+.\"
+.\" Copyright (C) 1991 Carnegie Mellon University - All rights reserved */
+.\"
+.\" Author: Sohan C. Ramakrishna Pillai
+.\"
+.TH DEPOT 1 "25 September 1991"
+.SH NAME
+depot \- Install and Remove Software Collections
+.SH SYNOPSIS
+.B depot
+[ 
+options
+]
+[
+\-T targetdir
+]
+[
+\-f collection_list
+]
+[
+collection-name
+]
+.SH DESCRIPTION
+.I depot
+manages the unified installation of diverse software collections into a
+single location.
+.LP
+Software collections may be any combination of files under a common
+location, but are usually composed of files associated with a single
+application. \fIdepot\fP
+can be used to control the mapping of software from a diverse set of
+such collections onto the target location \fItargetdir\fP
+specified by the \fB-T\fP option so as to provide a consistent
+view of software at the target location. In the absence of a
+\fB-T\fP option, the \fItargetdir\fP defaults to one directory level
+above the current working directory.
+.LP
+Mapping of software from
+collections to the \fItargetdir\fP may be achieved either by making
+appropriate symbolic links or by appropriately copying files from the
+collections to the target location. This and other aspects used
+to customize the installation of software by \fIdepot\fP
+may be specified in a file called \fBcustom.depot\fP
+in a special directory called \fBdepot\fP under the \fItargetdir\fP.
+A description of possible customizations is available in
+.BR custom.depot (5).
+.LP
+For each collection, the manner in which software under
+the collection's directory tree is mapped onto the software tree at the 
+\fItargetdir\fP may be specified in a file called \fBdepot.conf\fP
+at the top level of the collection's directory tree. If no
+\fBdepot.conf\fP file exists, the entire directory tree of the
+collection is mapped onto the software tree at the \fItargetdir\fP.
+The \fBdepot.conf\fP file is described in further detail in
+.BR depot.conf (5).
+.SH OPTIONS
+.sp 1
+.TP
+.B \-T targetdir
+sets the target location onto which \fIdepot\fP maps collections to be
+\fItargetdir\fP. Defaults to one level above the current
+working directory.
+.TP
+.B \-a
+causes all collections on the \fIsearchpath\fP to be installed (or updated).
+.TP
+.B \-d
+causes software from the specified collections to be deleted (uninstalled)
+from the \fItargetdir\fP.
+.TP
+.B \-h
+print a help message
+.TP
+.B \-n
+no update mode, causes \fIdepot\fP to print out update actions, without
+actually doing any updating.
+.TP
+.B \-q
+quick update mode, causes \fIdepot\fP to quickly update only the specified
+collections without checking the integrity of the \fItargetdir\fP.
+.TP
+.B \-Q
+another quick update mode, causes \fIdepot\fP to trust the database as accurately
+reflecting the state of the \fItargetdir\fP and \fIvice versa\fP.
+.TP
+.B \-t
+causes depot to use modification time information for updating maps by copy.
+.TP
+.B \-v
+verbose mode, causes \fIdepot\fP to send messages to the standard output
+describing its actions.
+.TP
+.B \-x
+print a Help message
+.TP
+.B \-R
+repair mode, repairs a corrupted \fItargetdir\fP using the current database.
+.TP
+.B \-B
+build new database and \fItargetdir\fP from scratch.
+.TP
+.B \-f collection_list
+specify a file that contains a list of collections to be processed.
+.TP
+.B \-c
+use only the collections specified either in the argument list or in a file 
+specified by the using \fB-f\fP.
+.SH LOCKING OPTIONS
+.TP
+.B \-l
+locks the \fItargetdir\fP, thereby inhibiting \fIdepot\fP updates
+on the \fItargetdir\fP.
+.TP
+.B \-i 
+implicitly locked mode, enables the user to perform \fIdepot\fP updates
+on \fItargetdir\fP, even if a previous lock by that user is in place. 
+.TP
+.B \-u
+unlocks the \fItargetdir\fP, if and only if it was previously locked by
+the same user.
+.TP
+.B \-U 
+breaks a lock on \fItargetdir\fP set by another user. 
+.TP
+.B \-L
+like \fB-U\fP above but replaces the lock with a new one for the current user.
+.SH FILES
+.PD 0
+.TP 20
+.B \[targetdir\]/depot/custom.depot
+resource file for customization
+.TP
+.B \[collectiondir\]/depot.conf
+configuration file for mapping collection
+.TP
+.B \[targetdir\]/depot/struct.depot
+database file for targetdir
+.TP
+.B \[targetdir\]/depot/lock.depot
+lock file for targetdir
+.PD
+.SH "SEE ALSO"
+custom.depot(5), depot.conf(5)
+.SH AUTHOR
+Sohan C. Ramakrishna-Pillai
+.SH "STUFF TO BE DOCUMENTED FURTHER"
+meanings of possible errors, any important caveats.

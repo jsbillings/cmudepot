@@ -1,0 +1,204 @@
+.\"
+.\" $Header: /usr/user/ww0r/RCS/custom.depot.man,v 4.6 1992/08/14 19:56:27 ww0r Exp $ 
+.\" $Source: /usr/user/ww0r/RCS/custom.depot.man,v $ 
+.\"
+.\" Copyright (C) 1991 Carnegie Mellon University - All rights reserved */
+.\"
+.\" Author: Sohan C. Ramakrishna Pillai
+.\"
+.TH CUSTOM.DEPOT 5 "25 September 1991"
+.SH NAME
+custom.depot \- depot customization instructions
+.SH SYNOPSIS
+.B \[targetdir\]/depot/custom.depot
+.SH DESCRIPTION
+The file
+.I custom.depot
+contains user-specified values for resources for \fBdepot\fP(1)
+which may be used to tailor the behavior of \fBdepot\fP(1) as desired.
+Resources are specified as strings of the form
+.sp 1
+.ce 5
+\fIcollection-name.preference: value\fP
+or
+\fIcommandlabel.preference: value\fP
+or
+\fIpreference: value\fP
+.sp 1
+one on each line in the \fIcustom.depot\fP file.
+.LP
+The first form is used to specify resources which are to be
+applied on a per collection basis. An asterisk (*) may be used
+in place of the collection-name to instruct \fBdepot\fP(1)
+to apply the preference to all collections.
+.LP
+The second form is used to specify resources which are to be
+applied to command labels specified in the configuration files of
+collections (see \fBdepot.conf(5)\fP).
+.LP
+The third form is used for resources which
+apply to the \fBdepot\fP(1) program in general.
+.LP
+Lines in \fBcustom.depot\fP starting with a # are treated as
+comments and ignored by \fBdepot\fP(1).
+.LP
+\fBDepot\fP(1) recognizes the following resources:
+.PP
+.TP 8
+label.command: commandname argumentlist
+specifies the actual command and list of arguments to be associated
+with the given label. The magic sequence %t may be used in the
+commandname and argumentlist to refer to the \fItargetdir\fP. If the
+commandname does not start with either a %t or a /, it is assumed to be
+an executable to be searched for using the PATH environment variable.
+.PP
+.TP 8
+copytarget: filelist
+specifies a list of files (or directories!) under \fItargetdir\fP
+which \fBdepot\fP(1) is to install by making
+copies of the appropriate sources. This preference supersedes any
+collection-specific mapcommand preference for these files.
+This preference also supersedes any linktarget preference
+for these files. 
+If a directory is specified then all the files and subdirectories
+will be copied.
+The list of files must be separated by commas
+with no intervening whitespaces. 
+Regular expressions are not supported.
+.sp
+The target specification should be relative to the environment. 
+For example, the following would specify that all files in the bin 
+directory and all the files in any subdirectories of bin should be copied: 
+.ce 
+copytarget: bin
+.PP
+.TP 8
+deletetarget: filelist
+specifies a list of files (or directories!) under \fItargetdir\fP
+which \fBdepot\fP(1) is to delete if any of them exist. This
+preference supersedes any attempt at installation from any collection
+for these files. This preference also supersedes any
+copytarget or linktarget preference
+for these files. 
+If a directory is specified then all the files and subdirectories
+will be deleted.
+See the \fBcopytarget\fP option for more details on the mechanics.
+.PP
+.TP 8
+deleteunreferenced: true/false
+specifies whether \fBdepot\fP(1) is to delete or maintain files under
+\fItargetdir\fP which are not referenced by any collection
+in the current database. Defaults to true.
+.PP
+.TP 8
+ignore: collectionlist
+specifies a list of possible collections which will not be installed
+by \fBdepot\fP(1). 
+The collection names must be separated by commas
+with no intervening whitespaces. 
+Multiple instances of ignore will be concatenated together. 
+.PP
+.TP 8
+linktarget: filelist
+specifies a list of files (or directories!) under \fItargetdir\fP
+which \fBdepot\fP(1) is to install by
+making links to the appropriate sources. This preference supersedes
+any collection-specific mapcommand preference
+for these files. 
+If a directory is specified then all the files and subdirectories
+will be linked.
+See the \fBcopytarget\fP option for more details on the mechanics.
+.PP
+.TP 8
+collection.mapcommand: copy/link
+specifies whether \fBdepot\fP(1) installs software from the
+named collection by making copies at the appropriate location
+under the \fItargetdir\fP or by making symbolic links instead.
+Defaults to link.
+.br
+.PP
+.TP 8
+nooptarget: filelist
+specifies a list of files (or directories!) under \fItargetdir\fP
+which \fBdepot\fP(1) is to not install, update
+or modify in any way during its operation. This preference supersedes
+any attempt at installation from any collection for these files.
+This preference also supersedes any copytarget, deletetarget or
+linktarget preference
+for these files. 
+If a directory is specified then all the files and subdirectories 
+will be ignored.
+See the \fBcopytarget\fP option for more details on the mechanics.
+.PP
+.TP 8
+collection.override: collectionlist
+specifies a list of collections whose software contributions may be
+overwritten by the named collection in case of a conflict during
+installation.
+Multiple overriders will be concatenated together. 
+.PP
+.TP 8
+collection.path: path
+specifies the directory where software for the named collection
+resides. The path must be either an absolute pathname or a path
+relative to the \fItargetdir\fP.
+.PP
+.TP 8
+collection.searchpath: pathlist
+specifies a list of directories under which \fBdepot\fP(1) is to search
+for the named collection if no specific path has been specified for
+the collection. The pathnames must be either absolute pathnames or
+paths relative to the \fItargetdir\fP and must be separated by commas
+with no intervening whitespaces. A collection for which no
+searchpath is specified is searched for under
+[targetdir]/depot.
+.PP
+.TP 8
+specialfile: filelist
+specifies a list of files (or directories!) under \fItargetdir\fP
+which \fBdepot\fP(1) should not attempt to update or modify in any
+way during its operation. Any attempt by any collection to modify
+any file or directory tree specified in the filelist will cause
+\fBdepot\fP to exit with an error message.
+The list of files must be separated by commas with no intervening
+whitespaces. 
+Multiple instances of specialfile will be concatenated together. 
+.PP
+.TP 8
+usemodtimes: true/false
+specifies whether \fBdepot\fP(1) is to use modification time
+information for updating maps by copy. Defaults to false.
+May be overridden by the \-t flag while running \fBdepot\fP(1).
+.PP
+.TP 8
+collection.version: versionnumber
+specifies the version of the named collection which \fBdepot\fP(1)
+is to use during installation. If no version is specified, the
+version found with the highest version number is used by \fBdepot\fP(1).
+Versions for collections are specified by appending a version number
+following a delimiter to the collection name. For example,
+.BR
+With the default version delimiter of ~, Version 11 of
+the collection named foo would be specified as
+.BR
+.ce 1
+foo~11
+.PP
+.TP 8
+versiondelimiter: character
+specifies the character used to delimit version numbers. The default 
+delimiter is a tilde(~). 
+'/' cannot be used as a version delimiter character.
+.SH WARNINGS
+When the mapcommand is set to copy or when the copytarget option is used, 
+\fBdepot\fP(1) will make EXACT copies of links. 
+This means that the link itself will be copied and not what the link 
+points to. 
+Futhermore, any manipulation with the \fBdepot.conf\fP will not change 
+what the link points to.  
+Thus, if a relative symlink is moved into a different directory with the
+\fBdepot.conf\fP the link could end up pointing at the wrong item.
+.SH AUTHOR
+Sohan C. Ramakrishna-Pillai
+.SH "SEE ALSO"
+depot(1)

@@ -1,0 +1,104 @@
+# Relatively generic Makefile
+# 
+# $Header: /afs/andrew.cmu.edu/system/src/local/depot/019/RCS/Makefile.dist,v 1.3 1992/07/22 14:44:22 ww0r Exp $
+#
+
+## Chose the C compiler. 
+# default
+CC=cc
+# Sun C
+#CC=/usr/lang/cc
+
+## Optimization flags
+# default
+OPT=-O
+# Sun C
+#OPT=-fast
+# pmax mips compiler
+#OPT=-O2 -Olimit 2000
+# HPUX
+#OPT=+O2 -DUSE_UTIME
+
+## defines
+## System V variants need to define USE_UTIME
+## System V variants with BSD libraries need to do a -D_BSD (or whatever)
+## here.
+# default
+DEFINES=
+# sample rs6000
+#DEFINES=-D_BSD
+# sample hpux
+#DEFINES=-DUSE_UTIME
+
+## Extra libraries
+# default
+EXTRALIBS=
+# RS6000
+#EXTRALIBS=-lbsd
+
+## uncomment to use the BSD malloc. See the README file about this
+#MALLOCSRC=Malloc.c
+#MALLOCOBJ=Malloc.${SUF}
+
+## comment out ALL the AFS lines if you don't have AFS
+## This assumes that AFS was installed in /usr/local. Change /usr/local
+## to the appropriate place if this is not correct.
+AFSSRC=AndrewFileSystem.c
+AFSOBJ=AndrewFileSystem.${SUF}
+AFSCFLAGS=-DUSE_FSINFO -I/usr/local/include
+AFSLIBDIR=/usr/local/lib
+AFSLIBS=${AFSLIBDIR}/afs/libvolser.a ${AFSLIBDIR}/afs/vlib.a \
+    ${AFSLIBDIR}/afs/libacl.a ${AFSLIBDIR}/afs/libvldb.a \
+    ${AFSLIBDIR}/libubik.a ${AFSLIBDIR}/afs/libauth.a \
+    ${AFSLIBDIR}/afs/libsys.a ${AFSLIBDIR}/afs/libcmd.a \
+    ${AFSLIBDIR}/librxkad.a ${AFSLIBDIR}/libdes.a \
+    ${AFSLIBDIR}/librx.a ${AFSLIBDIR}/liblwp.a \
+    ${AFSLIBDIR}/afs/libcom_err.a ${AFSLIBDIR}/afs/libkauth.a \
+    ${AFSLIBDIR}/afs/util.a
+
+## Installation location
+# no default. This string is NOT hardcoded into the depot binary
+DESTDIR=
+
+## Installation utility
+# note that this install will create directories that do not already exist.
+# Putting /bin/cp here won't worry. sorry
+INSTALL=install
+
+# should be nothing more to change after this point. Type make and
+# send me mail if I'm wrong.
+CFLAGS=${OPT} ${AFSCFLAGS} ${DEFINES}
+LDOPTIONS=${CFLAGS}
+
+SUF=o
+.SUFFIXES: .u
+.c.u:
+	$(CC) -j $(CFLAGS) $<
+ 
+SRCS = depot.c DepotDB.c DepotDBVersion1.c DepotDBCommand.c CollectionList.c \
+       Collection.c Preference.c PreferenceUtil.c Lock.c check.c \
+       update.c util.c ${AFSSRC} ${MALLOCSRC}
+
+OBJS = depot.${SUF} DepotDB.${SUF} DepotDBVersion1.${SUF}\
+       DepotDBCommand.${SUF} CollectionList.${SUF} Collection.${SUF} \
+       Preference.${SUF} PreferenceUtil.${SUF} Lock.${SUF} \
+       ${AFSOBJ} check.${SUF} update.${SUF} util.${SUF} ${MALLOCOBJ}
+
+depot: ${OBJS}
+	$(CC) ${LDOPTIONS} -o $@ ${OBJS} ${EXTRALIBS} ${AFSLIBS} 
+
+install: install.depot install.man install.include
+	
+install.man:
+	$(INSTALL) depot.man ${DESTDIR}/man/man1/depot.1
+	$(INSTALL) custom.depot.man ${DESTDIR}/man/man5/custom.depot.5
+	$(INSTALL) depot.conf.man ${DESTDIR}/man/man5/depot.conf.5
+
+install.depot: depot
+	${INSTALL} depot ${DESTDIR}/bin/depot
+
+install.include:
+	${INSTALL} DepotErrorCodes.h ${DESTDIR}/include/DepotErrorCodes.h
+
+clean:
+	rm -f ${OBJS} core depot
